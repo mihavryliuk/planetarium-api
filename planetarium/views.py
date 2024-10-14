@@ -1,3 +1,6 @@
+from datetime import datetime
+
+from django.db.models import F, Count
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import mixins, status, viewsets
@@ -6,9 +9,10 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from planetarium.models import ShowTheme, PlanetariumDome, AstronomyShow
+from planetarium.models import ShowTheme, PlanetariumDome, AstronomyShow, ShowSession
 from planetarium.serializers import ShowThemeSerializer, PlanetariumDomeSerializer, AstronomyShowListSerializer, \
-    AstronomyShowDetailSerializer, AstronomyShowImageSerializer, AstronomyShowSerializer
+    AstronomyShowDetailSerializer, AstronomyShowImageSerializer, AstronomyShowSerializer, ShowSessionSerializer, \
+    ShowSessionListSerializer, ShowSessionDetailSerializer
 
 
 class ShowThemeViewSet(
@@ -99,4 +103,58 @@ class AstronomyShowViewSet(
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
+
+class ShowSessionViewSet(viewsets.ModelViewSet):
+    queryset = (
+        ShowSession.objects.all()
+        .select_related("astronomy_show", "planetarium_dome")
+        .annotate(
+            tickets_available=(F("planetarium_dome__capacity") - Count("tickets"))
+        )
+    )
+    serializer_class = ShowSessionSerializer
+
+    def get_queryset(self):
+        date = self.request.query_params.get("date")
+        show_id_str = self.request.query_params.get("show")
+
+        queryset = self.queryset
+
+        if date:
+            date = datetime.strptime(date, "%Y-%m-%d").date()
+            queryset = queryset.filter(show_time__date=date)
+
+        if show_id_str:
+            queryset = queryset.filter(astronomy_show_id=int(show_id_str))
+
+        return queryset
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return ShowSessionListSerializer
+
+        if self.action == "retrieve":
+            return ShowSessionDetailSerializer
+
+        return ShowSessionSerializer
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "show",
+                type=OpenApiTypes.INT,
+                description="Filter by astronomy show id (ex. ?show=2)",
+            ),
+            OpenApiParameter(
+                "date",
+                type=OpenApiTypes.DATE,
+                description=(
+                    "Filter by date of ShowSession "
+                    "(ex. ?date=2022-10-23)"
+                ),
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
