@@ -5,14 +5,15 @@ from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAdminUser
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from planetarium.models import ShowTheme, PlanetariumDome, AstronomyShow, ShowSession
+from planetarium.models import ShowTheme, PlanetariumDome, AstronomyShow, ShowSession, Reservation
 from planetarium.serializers import ShowThemeSerializer, PlanetariumDomeSerializer, AstronomyShowListSerializer, \
     AstronomyShowDetailSerializer, AstronomyShowImageSerializer, AstronomyShowSerializer, ShowSessionSerializer, \
-    ShowSessionListSerializer, ShowSessionDetailSerializer
+    ShowSessionListSerializer, ShowSessionDetailSerializer, ReservationSerializer, ReservationListSerializer
 
 
 class ShowThemeViewSet(
@@ -158,3 +159,30 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
+
+class ReservationPagination(PageNumberPagination):
+    page_size = 10
+    max_page_size = 100
+
+
+class ReservationViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    viewsets.GenericViewSet,
+):
+    queryset = Reservation.objects.all()
+    serializer_class = ReservationSerializer
+    pagination_class = ReservationPagination
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        return Reservation.objects.filter(user=self.request.user)
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return ReservationListSerializer
+
+        return ReservationSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
