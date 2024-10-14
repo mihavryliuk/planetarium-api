@@ -1,3 +1,14 @@
-from django.shortcuts import render
+from rest_framework import mixins
+from rest_framework.viewsets import GenericViewSet
 
-# Create your views here.
+from planetarium.models import ShowTheme
+from planetarium.serializers import ShowThemeSerializer
+
+
+class ShowThemeViewSet(
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    GenericViewSet,
+):
+    queryset = ShowTheme.objects.all()
+    serializer_class = ShowThemeSerializer
