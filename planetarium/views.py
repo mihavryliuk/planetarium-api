@@ -110,7 +110,9 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
         ShowSession.objects.all()
         .select_related("astronomy_show", "planetarium_dome")
         .annotate(
-            tickets_available=(F("planetarium_dome__capacity") - Count("tickets"))
+            tickets_available=(
+                F("planetarium_dome__rows") * F("planetarium_dome__seats_in_row") - Count("tickets")
+            )
         )
     )
     serializer_class = ShowSessionSerializer
@@ -149,10 +151,7 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
             OpenApiParameter(
                 "date",
                 type=OpenApiTypes.DATE,
-                description=(
-                    "Filter by date of ShowSession "
-                    "(ex. ?date=2022-10-23)"
-                ),
+                description="Filter by date of ShowSession (ex. ?date=2022-10-23)",
             ),
         ]
     )

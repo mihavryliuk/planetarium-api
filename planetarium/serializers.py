@@ -11,9 +11,14 @@ class ShowThemeSerializer(serializers.ModelSerializer):
 
 
 class PlanetariumDomeSerializer(serializers.ModelSerializer):
+    capacity = serializers.SerializerMethodField()
+
     class Meta:
         model = PlanetariumDome
         fields = ("id", "name", "rows", "seats_in_row", "capacity")
+
+    def get_capacity(self, obj):
+        return obj.capacity
 
 
 class AstronomyShowSerializer(serializers.ModelSerializer):
