@@ -1,7 +1,14 @@
 from django.db import transaction
 from rest_framework import serializers
 
-from planetarium.models import ShowTheme, PlanetariumDome, AstronomyShow, ShowSession, Ticket, Reservation
+from planetarium.models import (
+    ShowTheme,
+    PlanetariumDome,
+    AstronomyShow,
+    ShowSession,
+    Ticket,
+    Reservation
+)
 
 
 class ShowThemeSerializer(serializers.ModelSerializer):
@@ -71,10 +78,22 @@ class ShowSessionSerializer(serializers.ModelSerializer):
 
 
 class ShowSessionListSerializer(ShowSessionSerializer):
-    astronomy_show_title = serializers.CharField(source="astronomy_show.title", read_only=True)
-    astronomy_show_image = serializers.ImageField(source="astronomy_show.image", read_only=True)
-    planetarium_dome_name = serializers.CharField(source="planetarium_dome.name", read_only=True)
-    planetarium_dome_capacity = serializers.IntegerField(source="planetarium_dome.capacity", read_only=True)
+    astronomy_show_title = serializers.CharField(
+        source="astronomy_show.title",
+        read_only=True
+    )
+    astronomy_show_image = serializers.ImageField(
+        source="astronomy_show.image",
+        read_only=True
+    )
+    planetarium_dome_name = serializers.CharField(
+        source="planetarium_dome.name",
+        read_only=True
+    )
+    planetarium_dome_capacity = serializers.IntegerField(
+        source="planetarium_dome.capacity",
+        read_only=True
+    )
     tickets_available = serializers.IntegerField(read_only=True)
 
     class Meta:
@@ -123,11 +142,21 @@ class TicketSeatsSerializer(TicketSerializer):
 class ShowSessionDetailSerializer(ShowSessionSerializer):
     astronomy_show = AstronomyShowDetailSerializer(many=False, read_only=True)
     planetarium_dome = PlanetariumDomeSerializer(many=False, read_only=True)
-    taken_places = TicketSeatsSerializer(source="tickets", many=True, read_only=True)
+    taken_places = TicketSeatsSerializer(
+        source="tickets",
+        many=True,
+        read_only=True
+    )
 
     class Meta:
         model = ShowSession
-        fields = ("id", "show_time", "astronomy_show", "planetarium_dome", "taken_places")
+        fields = (
+            "id",
+            "show_time",
+            "astronomy_show",
+            "planetarium_dome",
+            "taken_places"
+        )
 
 
 class ReservationSerializer(serializers.ModelSerializer):

@@ -26,8 +26,15 @@ class AstronomyShow(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     duration = models.IntegerField()
-    themes = models.ManyToManyField(ShowTheme, related_name="astronomy_shows", blank=True)
-    image = models.ImageField(null=True, upload_to=astronomy_show_image_file_path)
+    themes = models.ManyToManyField(
+        ShowTheme,
+        related_name="astronomy_shows",
+        blank=True
+    )
+    image = models.ImageField(
+        null=True,
+        upload_to=astronomy_show_image_file_path
+    )
 
     def __str__(self):
         return self.title
@@ -47,8 +54,16 @@ class PlanetariumDome(models.Model):
 
 
 class ShowSession(models.Model):
-    astronomy_show = models.ForeignKey(AstronomyShow, on_delete=models.CASCADE, related_name="show_sessions")
-    planetarium_dome = models.ForeignKey(PlanetariumDome, on_delete=models.CASCADE, related_name="show_sessions")
+    astronomy_show = models.ForeignKey(
+        AstronomyShow,
+        on_delete=models.CASCADE,
+        related_name="show_sessions"
+    )
+    planetarium_dome = models.ForeignKey(
+        PlanetariumDome,
+        on_delete=models.CASCADE,
+        related_name="show_sessions"
+    )
     show_time = models.DateTimeField()
 
     class Meta:

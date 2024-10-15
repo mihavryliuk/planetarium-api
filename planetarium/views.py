@@ -10,10 +10,26 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from planetarium.models import ShowTheme, PlanetariumDome, AstronomyShow, ShowSession, Reservation
-from planetarium.serializers import ShowThemeSerializer, PlanetariumDomeSerializer, AstronomyShowListSerializer, \
-    AstronomyShowDetailSerializer, AstronomyShowImageSerializer, AstronomyShowSerializer, ShowSessionSerializer, \
-    ShowSessionListSerializer, ShowSessionDetailSerializer, ReservationSerializer, ReservationListSerializer
+from planetarium.models import (
+    ShowTheme,
+    PlanetariumDome,
+    AstronomyShow,
+    ShowSession,
+    Reservation
+)
+from planetarium.serializers import (
+    ShowThemeSerializer,
+    PlanetariumDomeSerializer,
+    AstronomyShowListSerializer,
+    AstronomyShowDetailSerializer,
+    AstronomyShowImageSerializer,
+    AstronomyShowSerializer,
+    ShowSessionSerializer,
+    ShowSessionListSerializer,
+    ShowSessionDetailSerializer,
+    ReservationSerializer,
+    ReservationListSerializer
+)
 
 
 class ShowThemeViewSet(
@@ -97,7 +113,7 @@ class AstronomyShowViewSet(
             OpenApiParameter(
                 "title",
                 type=OpenApiTypes.STR,
-                description="Filter by astronomy show title (ex. ?title=planet)",
+                description="Filter by show title (ex. ?title=planet)",
             ),
         ]
     )
@@ -111,7 +127,9 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
         .select_related("astronomy_show", "planetarium_dome")
         .annotate(
             tickets_available=(
-                F("planetarium_dome__rows") * F("planetarium_dome__seats_in_row") - Count("tickets")
+                F("planetarium_dome__rows")
+                * F("planetarium_dome__seats_in_row")
+                - Count("tickets")
             )
         )
     )
@@ -151,7 +169,7 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
             OpenApiParameter(
                 "date",
                 type=OpenApiTypes.DATE,
-                description="Filter by date of ShowSession (ex. ?date=2022-10-23)",
+                description="Filter by date of Session (ex. ?date=2022-10-23)",
             ),
         ]
     )
