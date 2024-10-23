@@ -123,7 +123,7 @@ class AstronomyShowViewSet(
 
 class ShowSessionViewSet(viewsets.ModelViewSet):
     queryset = (
-        ShowSession.objects.all()
+        ShowSession.objects
         .select_related("astronomy_show", "planetarium_dome")
         .annotate(
             tickets_available=(

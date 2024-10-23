@@ -76,7 +76,9 @@ class ShowSession(models.Model):
 class Reservation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="reservations"
     )
 
     class Meta:
@@ -125,17 +127,9 @@ class Ticket(models.Model):
             ValidationError,
         )
 
-    def save(
-            self,
-            force_insert=False,
-            force_update=False,
-            using=None,
-            update_fields=None,
-    ):
+    def save(self, *args, **kwargs):
         self.full_clean()
-        return super(Ticket, self).save(
-            force_insert, force_update, using, update_fields
-        )
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return (f"Ticket: {self.id},"

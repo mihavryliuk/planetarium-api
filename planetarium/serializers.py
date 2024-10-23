@@ -18,14 +18,11 @@ class ShowThemeSerializer(serializers.ModelSerializer):
 
 
 class PlanetariumDomeSerializer(serializers.ModelSerializer):
-    capacity = serializers.SerializerMethodField()
+    capacity = serializers.IntegerField(source="capacity", read_only=True)
 
     class Meta:
         model = PlanetariumDome
         fields = ("id", "name", "rows", "seats_in_row", "capacity")
-
-    def get_capacity(self, obj):
-        return obj.capacity
 
 
 class AstronomyShowSerializer(serializers.ModelSerializer):
@@ -126,7 +123,7 @@ class TicketSerializer(serializers.ModelSerializer):
 
 
 class TicketListSerializer(TicketSerializer):
-    show_session = ShowSessionListSerializer(many=False, read_only=True)
+    show_session = ShowSessionListSerializer(read_only=True)
 
     class Meta:
         model = Ticket
@@ -140,8 +137,8 @@ class TicketSeatsSerializer(TicketSerializer):
 
 
 class ShowSessionDetailSerializer(ShowSessionSerializer):
-    astronomy_show = AstronomyShowDetailSerializer(many=False, read_only=True)
-    planetarium_dome = PlanetariumDomeSerializer(many=False, read_only=True)
+    astronomy_show = AstronomyShowDetailSerializer(read_only=True)
+    planetarium_dome = PlanetariumDomeSerializer(read_only=True)
     taken_places = TicketSeatsSerializer(
         source="tickets",
         many=True,
