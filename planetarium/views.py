@@ -85,7 +85,7 @@ class AstronomyShowViewSet(
             return AstronomyShowDetailSerializer
         if self.action == "upload_image":
             return AstronomyShowImageSerializer
-        return AstronomyShowSerializer
+        return self.serializer_class
 
     @action(
         methods=["POST"],
@@ -157,7 +157,7 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
         if self.action == "retrieve":
             return ShowSessionDetailSerializer
 
-        return ShowSessionSerializer
+        return self.serializer_class
 
     @extend_schema(
         parameters=[
